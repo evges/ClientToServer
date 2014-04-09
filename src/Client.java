@@ -5,12 +5,14 @@ public class Client {
 
     private static final int SERVER_PORT = 7777;
     private static final String ADDRESS = "127.0.0.1";
+    private static final int SIZE = 64 * 1024; // 64 KB
     Socket socket = null;
     File folder = null;
     InputStream sin = null;
     OutputStream sout = null;
     DataInputStream in = null;
     DataOutputStream out = null;
+
 
 
     String dataFolder = null;
@@ -21,7 +23,7 @@ public class Client {
         client.serverConnect();
         client.clientFolder();
         client.serverFolder();
-        client.serverDownloads();
+        client.serverUploads();
     }
 
     private void serverConnect(){
@@ -46,7 +48,9 @@ public class Client {
             dataFolder = readerDataFolder.readLine();
             folder = new File(dataFolder);
         }
-        //ловить исключения
+        //
+        //добавить! ловить исключения
+        //
     }
 
     private void serverFolder() throws IOException{
@@ -58,17 +62,39 @@ public class Client {
         in = new DataInputStream(sin);
         out = new DataOutputStream(sout);
 
-        System.out.println("Введите название каталога с файлами на сервере");
+        System.out.print("Введите название каталога с файлами на сервере: ");
         BufferedReader readerSaveFiles = new BufferedReader(new InputStreamReader(System.in));
         pathToFolder = readerSaveFiles.readLine();
         out.writeUTF(pathToFolder);
-        pathToFolder = in.readUTF();
-        System.out.println("Каталог " + pathToFolder + " создан на сервере");
-
-        out.flush();
-
+        String pathToFolder1 = in.readUTF();
+        if (pathToFolder.equals(pathToFolder1)){
+            System.out.println("Каталог " + pathToFolder1 + " создан на сервере.");
+        } else {
+            System.out.println("Ошибка при создании каталога на сервере");
+            System.exit(0);
+        }
     }
-    private void serverDownloads(){
 
+    private void serverUploads() throws IOException{
+
+        File dir = new File(dataFolder);
+        String[] fileNames = dir.list();
+        System.out.println("Отправка " + fileNames.length + " файлов на сервер...");
+        int i = 0;
+        byte[] buffer = new byte[SIZE];
+        for (String fileName:fileNames) {
+            System.out.println("Передаю " + ++i + " файл");
+            File f = new File(dataFolder + "/" + fileName);
+            FileInputStream fis = new FileInputStream(f);
+            long fileSize = f.length();
+            out.writeUTF(fileName);
+            out.writeLong(fileSize);
+            int read = 0;
+            while ((read = fis.read(buffer)) > 0) {
+                out.write(buffer, 0, read);
+            }
+        }
+        System.out.println("Все файлы переданы");
+        socket.close();
     }
 }
