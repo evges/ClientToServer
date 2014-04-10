@@ -17,20 +17,16 @@ public class Server {
         server.serverConnect();
         server.serverFolder();
         server.serverDownloads();
-
     }
 
     private void serverConnect() throws IOException {
         ss = new ServerSocket(SERVER_PORT); // создаем сокет сервера и привязываем его к вышеуказанному порту
         System.out.println("Ожидание клиента.");
-
         Socket socket = ss.accept(); // заставляем сервер ждать подключений и выводим сообщение когда кто-то связался с сервером
         System.out.println("Клиент подключился");
-
         // Берем входной и выходной потоки сокета, теперь можем получать и отсылать данные клиенту.
         sin = socket.getInputStream();
         sout = socket.getOutputStream();
-
         // Конвертируем потоки в другой тип, чтоб легче обрабатывать текстовые сообщения.
         in = new DataInputStream(sin);
         out = new DataOutputStream(sout);
@@ -40,7 +36,7 @@ public class Server {
         pathToFolder = in.readUTF();
         File myPathToFolder = new File(pathToFolder);
         myPathToFolder.mkdirs();
-        out.writeUTF(pathToFolder);//отправка ответа о созданном каталоге
+        out.writeUTF(pathToFolder);
     }
 
     private void serverDownloads() throws IOException {

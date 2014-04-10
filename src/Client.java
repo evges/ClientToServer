@@ -12,9 +12,6 @@ public class Client {
     OutputStream sout = null;
     DataInputStream in = null;
     DataOutputStream out = null;
-
-
-
     String dataFolder = null;
     String pathToFolder = null;
 
@@ -48,53 +45,50 @@ public class Client {
             dataFolder = readerDataFolder.readLine();
             folder = new File(dataFolder);
         }
-        //
-        //добавить! ловить исключения
-        //
     }
 
-    private void serverFolder() throws IOException{
+    private void serverFolder(){
         // Берем входной и выходной потоки сокета, теперь можем получать и отсылать данные клиентом.
-        sin = socket.getInputStream();
-        sout = socket.getOutputStream();
-
-        // Конвертируем потоки в другой тип, чтоб легче обрабатывать текстовые сообщения.
-        in = new DataInputStream(sin);
-        out = new DataOutputStream(sout);
-
-        System.out.print("Введите название каталога с файлами на сервере: ");
-        BufferedReader readerSaveFiles = new BufferedReader(new InputStreamReader(System.in));
-        pathToFolder = readerSaveFiles.readLine();
-        out.writeUTF(pathToFolder);
-        String pathToFolder1 = in.readUTF();
-        if (pathToFolder.equals(pathToFolder1)){
+        try {
+            sin = socket.getInputStream();
+            sout = socket.getOutputStream();
+            // Конвертируем потоки в другой тип, чтоб легче обрабатывать текстовые сообщения.
+            in = new DataInputStream(sin);
+            out = new DataOutputStream(sout);
+            System.out.print("Введите название каталога с файлами на сервере: ");
+            BufferedReader readerSaveFiles = new BufferedReader(new InputStreamReader(System.in));
+            pathToFolder = readerSaveFiles.readLine();
+            out.writeUTF(pathToFolder);
+            String pathToFolder1 = in.readUTF();
             System.out.println("Каталог " + pathToFolder1 + " создан на сервере.");
-        } else {
+        } catch (IOException e){
             System.out.println("Ошибка при создании каталога на сервере");
-            System.exit(0);
         }
     }
 
-    private void serverUploads() throws IOException{
-
+    private void serverUploads() {
         File dir = new File(dataFolder);
         String[] fileNames = dir.list();
         System.out.println("Отправка " + fileNames.length + " файлов на сервер...");
         int i = 0;
         byte[] buffer = new byte[SIZE];
-        for (String fileName:fileNames) {
-            System.out.println("Передаю " + ++i + " файл");
-            File f = new File(dataFolder + "/" + fileName);
-            FileInputStream fis = new FileInputStream(f);
-            long fileSize = f.length();
-            out.writeUTF(fileName);
-            out.writeLong(fileSize);
-            int read = 0;
-            while ((read = fis.read(buffer)) > 0) {
-                out.write(buffer, 0, read);
+        try {
+            for (String fileName : fileNames) {
+                System.out.println("Передаю " + ++i + " файл");
+                File f = new File(dataFolder + "/" + fileName);
+                FileInputStream fis = new FileInputStream(f);
+                long fileSize = f.length();
+                out.writeUTF(fileName);
+                out.writeLong(fileSize);
+                int read;
+                while ((read = fis.read(buffer)) > 0) {
+                    out.write(buffer, 0, read);
+                }
             }
+            System.out.println("Все файлы переданы");
+            socket.close();
+        } catch (IOException e) {
+            System.out.println("Ошибка при отправке файлов");
         }
-        System.out.println("Все файлы переданы");
-        socket.close();
     }
 }
