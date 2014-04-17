@@ -6,14 +6,14 @@ public class Client {
     private static final int SERVER_PORT = 7777;
     private static final String ADDRESS = "127.0.0.1";
     private static final int SIZE = 64 * 1024; // 64 KB
-    Socket socket = null;
-    File folder = null;
-    InputStream sin = null;
-    OutputStream sout = null;
-    DataInputStream in = null;
-    DataOutputStream out = null;
-    String dataFolder = null;
-    String pathToFolder = null;
+    private Socket socket = null;
+    private File folder = null;
+    private InputStream sin = null;
+    private OutputStream sout = null;
+    private DataInputStream in = null;
+    private DataOutputStream out = null;
+    private String dataFolder = null;
+    private String pathToFolder = null;
 
     public static void main(String[] args) throws IOException {
         Client client = new Client();

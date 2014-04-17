@@ -5,12 +5,12 @@ public class Server {
 
     private static final int SERVER_PORT = 7777; // случайный порт (может быть любое число от 1025 до 65535)
     private static final int SIZE = 64 * 1024;
-    String pathToFolder = null;
-    InputStream sin = null;
-    OutputStream sout = null;
-    DataInputStream in =null;
-    DataOutputStream out = null;
-    ServerSocket ss = null;
+    private String pathToFolder = null;
+    private InputStream sin = null;
+    private OutputStream sout = null;
+    private DataInputStream in =null;
+    private DataOutputStream out = null;
+    private ServerSocket ss = null;
 
     public static void main(String[] args) throws IOException {
         Server server = new Server();
